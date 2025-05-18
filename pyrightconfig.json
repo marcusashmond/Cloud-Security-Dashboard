@@ -1,0 +1,22 @@
+# pyrightconfig.json - Python type checking configuration
+{
+  "include": ["backend"],
+  "exclude": [
+    "**/node_modules",
+    "**/__pycache__",
+    "**/.*"
+  ],
+  "ignore": ["**/migrations/**"],
+  "reportMissingImports": false,
+  "reportMissingTypeStubs": false,
+  "reportMissingModuleSource": false,
+  "reportGeneralTypeIssues": false,
+  "reportOptionalMemberAccess": false,
+  "reportOptionalCall": false,
+  "reportUnknownArgumentType": false,
+  "reportUnknownParameterType": false,
+  "reportUnknownVariableType": false,
+  "reportUnknownMemberType": false,
+  "reportPrivateUsage": false,
+  "reportConstantRedefinition": false
+}

@@ -1,0 +1,12 @@
+# Sample security logs in CSV format
+timestamp,event_type,severity,source_ip,destination_ip,username,description
+2026-01-15T10:00:00,failed_login,medium,203.0.113.42,192.168.1.100,admin,Failed login attempt
+2026-01-15T10:05:00,brute_force,critical,203.0.113.42,192.168.1.100,admin,Multiple failed login attempts detected
+2026-01-15T10:15:00,login_attempt,low,10.0.0.50,192.168.1.100,john.doe,Successful login
+2026-01-15T10:30:00,malware_detected,critical,185.220.101.23,192.168.1.100,service_account,Malware signature detected
+2026-01-15T11:00:00,unauthorized_access,high,89.248.165.12,172.16.0.25,unknown,Unauthorized access attempt
+2026-01-15T11:30:00,suspicious_activity,medium,45.33.32.156,192.168.1.100,user1,Unusual user behavior detected
+2026-01-15T12:00:00,data_exfiltration,critical,198.51.100.78,192.168.1.100,dbadmin,Large data transfer detected
+2026-01-15T12:30:00,network_anomaly,high,23.95.190.45,172.16.0.25,unknown,Port scan detected
+2026-01-15T13:00:00,policy_violation,medium,192.168.1.100,10.0.0.50,jane.smith,Security policy violation
+2026-01-15T13:30:00,file_integrity,high,192.168.1.100,172.16.0.25,root,File integrity check failed
