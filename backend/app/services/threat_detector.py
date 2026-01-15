@@ -17,21 +17,20 @@ from app.db.models import SecurityLog, SeverityLevel, EventType
 
 
 class ThreatDetector:
-    """ML-based threat detection system"""
     
     def __init__(self):
         self.model = None
-        self.label_encoders = {}
+        self.encoders = {}
         self.scaler = StandardScaler()
         self.model_path = "app/ml_models/threat_model.pkl"
-        self.encoders_path = "app/ml_models/encoders.pkl"
+        self.enc_path = "app/ml_models/encoders.pkl"
         self.scaler_path = "app/ml_models/scaler.pkl"
-        self.is_trained = False
+        self.trained = False
         
         # Try to load existing model
         # NOTE: Falls back to heuristics if model doesn't exist - this saved us during demo
         self.load_model()
-        # print(f"DEBUG: Model loaded: {self.is_trained}")  # Uncomment for debugging
+        # print(f"DEBUG: Model loaded: {self.trained}")  # Uncomment for debugging
         
         # Initialize with simple heuristic rules
         # These values were tuned based on our security team's feedback
@@ -56,15 +55,9 @@ class ThreatDetector:
             SeverityLevel.CRITICAL: 1.0,
         }
     
-    def predict_threat(self, log: SecurityLog) -> Tuple[bool, float, float]:
-        """
-        Predict if a log entry is a threat
-        
-        Returns:
-            (is_threat, confidence_score, threat_score)
-        """
+    def predict_threat(self, log):
         # If ML model is trained, use it
-        if self.is_trained and self.model:
+        if self.trained and self.model:
             try:
                 features = self._extract_features(log)
                 prediction = self.model.predict_proba([features])[0]
@@ -119,9 +112,9 @@ class ThreatDetector:
         features = []
         
         # Encode event type
-        if 'event_type' in self.label_encoders:
+        if 'event_type' in self.encoders:
             try:
-                event_encoded = self.label_encoders['event_type'].transform([log.event_type.value])[0]
+                event_encoded = self.encoders['event_type'].transform([log.event_type.value])[0]
             except:
                 event_encoded = 0
         else:
@@ -129,9 +122,9 @@ class ThreatDetector:
         features.append(event_encoded)
         
         # Encode severity
-        if 'severity' in self.label_encoders:
+        if 'severity' in self.encoders:
             try:
-                severity_encoded = self.label_encoders['severity'].transform([log.severity.value])[0]
+                severity_encoded = self.encoders['severity'].transform([log.severity.value])[0]
             except:
                 severity_encoded = 0
         else:
@@ -209,11 +202,11 @@ class ThreatDetector:
         y = df['is_threat'].astype(int)
         
         # Encode categorical features
-        self.label_encoders['event_type'] = LabelEncoder()
-        self.label_encoders['severity'] = LabelEncoder()
+        self.encoders['event_type'] = LabelEncoder()
+        self.encoders['severity'] = LabelEncoder()
         
-        X['event_type'] = self.label_encoders['event_type'].fit_transform(X['event_type'])
-        X['severity'] = self.label_encoders['severity'].fit_transform(X['severity'])
+        X['event_type'] = self.encoders['event_type'].fit_transform(X['event_type'])
+        X['severity'] = self.encoders['severity'].fit_transform(X['severity'])
         X['is_anomaly'] = X['is_anomaly'].astype(int)
         
         # Normalize numerical features
@@ -260,24 +253,22 @@ class ThreatDetector:
         }
     
     def load_model(self):
-        """Load pre-trained model."""
         try:
             if os.path.exists(self.model_path):
                 self.model = joblib.load(self.model_path)
-                self.label_encoders = joblib.load(self.encoders_path)
+                self.encoders = joblib.load(self.enc_path)
                 self.scaler = joblib.load(self.scaler_path)
-                self.is_trained = True
+                self.trained = True
                 print("✓ Pre-trained threat detection model loaded")
         except Exception as e:
             print(f"Could not load model: {e}")
-            self.is_trained = False
+            self.trained = False
     
     def save_model(self):
-        """Save trained model and encoders."""
         try:
             os.makedirs(os.path.dirname(self.model_path), exist_ok=True)
             joblib.dump(self.model, self.model_path)
-            joblib.dump(self.label_encoders, self.encoders_path)
+            joblib.dump(self.encoders, self.enc_path)
             joblib.dump(self.scaler, self.scaler_path)
             print(f"✓ Model saved to {self.model_path}")
         except Exception as e:

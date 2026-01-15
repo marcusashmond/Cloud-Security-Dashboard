@@ -12,6 +12,7 @@ export default function LogsTable() {
     severity: '',
     is_threat: '',
   })
+  const [temp, setTemp] = useState(null)
 
   useEffect(() => {
     fetchLogs()
@@ -24,10 +25,10 @@ export default function LogsTable() {
       if (filters.severity) params.append('severity', filters.severity)
       if (filters.is_threat) params.append('is_threat', filters.is_threat)
       
-      const response = await apiClient.get(`/logs?${params.toString()}`)
-      setLogs(response.data.logs)
-    } catch (error) {
-      console.error('Failed to fetch logs:', error)
+      const resp = await apiClient.get(`/logs?${params.toString()}`)
+      setLogs(resp.data.logs)
+    } catch (err) {
+      console.error('Failed to fetch logs:', err)
     } finally {
       setLoading(false)
     }
@@ -35,18 +36,18 @@ export default function LogsTable() {
 
   const exportToCSV = async () => {
     try {
-      const response = await apiClient.get('/logs/export/csv', {
+      const res = await apiClient.get('/logs/export/csv', {
         responseType: 'blob',
       })
-      const url = window.URL.createObjectURL(new Blob([response.data]))
+      const url = window.URL.createObjectURL(new Blob([res.data]))
       const link = document.createElement('a')
       link.href = url
       link.setAttribute('download', 'security_logs.csv')
       document.body.appendChild(link)
       link.click()
       link.remove()
-    } catch (error) {
-      console.error('Failed to export logs:', error)
+    } catch (e) {
+      console.error('Failed to export logs:', e)
     }
   }
 

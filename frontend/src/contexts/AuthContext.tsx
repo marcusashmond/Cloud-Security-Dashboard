@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react'
 import { apiClient } from '@/lib/api'
+import { useRouter } from 'next/navigation'
 
 interface User {
   id: number
@@ -26,6 +27,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [token, setToken] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [err, setErr] = useState(null)
 
   useEffect(() => {
     // Check for stored token on mount
@@ -39,7 +41,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [])
 
-  const fetchCurrentUser = async (authToken: string) => {
+  const fetchCurrentUser = async (authToken) => {
     try {
       const response = await apiClient.get('/auth/me', {
         headers: { Authorization: `Bearer ${authToken}` }

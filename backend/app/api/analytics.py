@@ -17,10 +17,9 @@ router = APIRouter()
 
 @router.get("/dashboard", response_model=DashboardSummary)
 async def get_dashboard_summary(
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    db = Depends(get_db),
+    current_user = Depends(get_current_user)
 ):
-    """Get dashboard summary statistics"""
     # Total logs
     total_logs = db.query(SecurityLog).count()
     
@@ -64,11 +63,10 @@ async def get_dashboard_summary(
 
 @router.get("/statistics", response_model=ThreatStatistics)
 async def get_threat_statistics(
-    days: int = Query(7, ge=1, le=90),
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    days = Query(7, ge=1, le=90),
+    db = Depends(get_db),
+    current_user = Depends(get_current_user)
 ):
-    """Get threat statistics for the specified time period"""
     start_date = datetime.utcnow() - timedelta(days=days)
     
     # Total events

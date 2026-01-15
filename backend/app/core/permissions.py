@@ -1,11 +1,10 @@
-"""Role-Based Access Control (RBAC) utilities."""
 from functools import wraps
 from fastapi import HTTPException, status
 from typing import List
 from app.db.models import UserRole
+import re
 
 class Permission:
-    """Permission definitions for RBAC."""
     # Designed this after looking at how GitHub does their permissions
     # Kept it simple - we can always add more granular perms later
     

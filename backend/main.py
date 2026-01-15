@@ -25,8 +25,7 @@ logger = logging.getLogger(__name__)
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
-    """Lifespan events for FastAPI"""
+async def lifespan(app):
     # Startup
     logger.info("Starting Security Dashboard API...")
     Base.metadata.create_all(bind=engine)

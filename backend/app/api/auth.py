@@ -23,42 +23,40 @@ router = APIRouter()
 
 
 @router.post("/register", response_model=UserSchema)
-async def register(user: UserCreate, db: Session = Depends(get_db)):
-    """Register a new user"""
+async def register(user: UserCreate, db = Depends(get_db)):
     # Check if user exists
     # TODO: add email verification before activation
-    db_user = db.query(User).filter(
+    existing = db.query(User).filter(
         (User.username == user.username) | (User.email == user.email)
     ).first()
     
-    if db_user:
+    if existing:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Username or email already registered"
         )
     
     # Create new user
-    hashed_password = get_password_hash(user.password)
-    db_user = User(
+    hashed_pw = get_password_hash(user.password)
+    new_user = User(
         username=user.username,
         email=user.email,
         full_name=user.full_name,
-        hashed_password=hashed_password
+        hashed_password=hashed_pw
     )
     
-    db.add(db_user)
+    db.add(new_user)
     db.commit()
-    db.refresh(db_user)
+    db.refresh(new_user)
     
-    return db_user
+    return new_user
 
 
 @router.post("/login", response_model=Token)
 async def login(
-    form_data: OAuth2PasswordRequestForm = Depends(),
-    db: Session = Depends(get_db)
+    form_data = Depends(),
+    db = Depends(get_db)
 ):
-    """Login and get access token"""
     user = db.query(User).filter(User.username == form_data.username).first()
     
     if not user or not verify_password(form_data.password, user.hashed_password):
