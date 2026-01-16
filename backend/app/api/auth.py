@@ -54,8 +54,8 @@ async def register(user: UserCreate, db = Depends(get_db)):
 
 @router.post("/login", response_model=Token)
 async def login(
-    form_data = Depends(),
-    db = Depends(get_db)
+    form_data: OAuth2PasswordRequestForm = Depends(OAuth2PasswordRequestForm),
+    db: Session = Depends(get_db)
 ):
     user = db.query(User).filter(User.username == form_data.username).first()
     

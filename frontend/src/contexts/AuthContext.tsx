@@ -61,7 +61,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     formData.append('username', username)
     formData.append('password', password)
 
-    const response = await apiClient.post('/auth/login', formData)
+    const response = await apiClient.post('/auth/login', formData, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+    })
     const { access_token } = response.data
 
     setToken(access_token)

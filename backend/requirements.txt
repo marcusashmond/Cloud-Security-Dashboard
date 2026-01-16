@@ -31,7 +31,6 @@ hiredis==2.3.2
 slowapi==0.1.9
 
 # CORS & Security
-python-cors==1.0.0
 pydantic==2.5.3
 
 # Testing

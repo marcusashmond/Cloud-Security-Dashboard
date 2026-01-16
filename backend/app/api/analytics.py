@@ -17,8 +17,8 @@ router = APIRouter()
 
 @router.get("/dashboard", response_model=DashboardSummary)
 async def get_dashboard_summary(
-    db = Depends(get_db),
-    current_user = Depends(get_current_user)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
     # Total logs
     total_logs = db.query(SecurityLog).count()
@@ -63,9 +63,9 @@ async def get_dashboard_summary(
 
 @router.get("/statistics", response_model=ThreatStatistics)
 async def get_threat_statistics(
-    days = Query(7, ge=1, le=90),
-    db = Depends(get_db),
-    current_user = Depends(get_current_user)
+    days: int = Query(7, ge=1, le=90),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
     start_date = datetime.utcnow() - timedelta(days=days)
     
@@ -119,20 +119,25 @@ async def get_threat_statistics(
     for ip, count in ip_data:
         top_source_ips.append({"ip": ip, "count": count})
     
-    # Timeline (events per day)
+    # Timeline (events per day) - optimized with single query
     timeline = []
+    timeline_data = db.query(
+        func.date(SecurityLog.timestamp).label('date'),
+        func.count(SecurityLog.id).label('count')
+    ).filter(
+        SecurityLog.timestamp >= start_date
+    ).group_by(func.date(SecurityLog.timestamp)).all()
+    
+    # Create map for quick lookup
+    date_counts = {str(date): count for date, count in timeline_data}
+    
+    # Fill in all days including zeros
     for i in range(days):
-        day_start = start_date + timedelta(days=i)
-        day_end = day_start + timedelta(days=1)
-        
-        count = db.query(SecurityLog).filter(
-            SecurityLog.timestamp >= day_start,
-            SecurityLog.timestamp < day_end
-        ).count()
-        
+        day = start_date + timedelta(days=i)
+        date_str = day.strftime("%Y-%m-%d")
         timeline.append({
-            "date": day_start.strftime("%Y-%m-%d"),
-            "count": count
+            "date": date_str,
+            "count": date_counts.get(date_str, 0)
         })
     
     return {
@@ -151,29 +156,31 @@ async def get_trends(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    """Get hourly trends"""
+    """Get hourly trends - optimized"""
     start_time = datetime.utcnow() - timedelta(hours=hours)
     
+    # Get all data in single query
+    hourly_counts = db.query(
+        func.strftime('%Y-%m-%d %H:00', SecurityLog.timestamp).label('hour'),
+        func.count(SecurityLog.id).label('total'),
+        func.sum(func.cast(SecurityLog.is_threat, func.INTEGER())).label('threats')
+    ).filter(
+        SecurityLog.timestamp >= start_time
+    ).group_by(func.strftime('%Y-%m-%d %H:00', SecurityLog.timestamp)).all()
+    
+    # Create map
+    hour_map = {hour: {'total': total, 'threats': threats or 0} for hour, total, threats in hourly_counts}
+    
+    # Fill in all hours
     hourly_data = []
     for i in range(hours):
-        hour_start = start_time + timedelta(hours=i)
-        hour_end = hour_start + timedelta(hours=1)
-        
-        total = db.query(SecurityLog).filter(
-            SecurityLog.timestamp >= hour_start,
-            SecurityLog.timestamp < hour_end
-        ).count()
-        
-        threats = db.query(SecurityLog).filter(
-            SecurityLog.timestamp >= hour_start,
-            SecurityLog.timestamp < hour_end,
-            SecurityLog.is_threat == True
-        ).count()
-        
+        hour_time = start_time + timedelta(hours=i)
+        hour_str = hour_time.strftime("%Y-%m-%d %H:00")
+        data = hour_map.get(hour_str, {'total': 0, 'threats': 0})
         hourly_data.append({
-            "hour": hour_start.strftime("%Y-%m-%d %H:00"),
-            "total": total,
-            "threats": threats
+            "hour": hour_str,
+            "total": data['total'],
+            "threats": data['threats']
         })
     
     return {"hourly_trends": hourly_data}
