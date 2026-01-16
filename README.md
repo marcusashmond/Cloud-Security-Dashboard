@@ -503,10 +503,9 @@ MIT License - feel free to use this project for learning or your own portfolio.
 
 ## 👨‍💻 Author
 
-**[Your Name]**
-- Portfolio: [your-portfolio.com]
-- LinkedIn: [linkedin.com/in/yourprofile]
-- GitHub: [github.com/yourusername]
+**Marcus Brew Ashmond**
+- LinkedIn: https://www.linkedin.com/in/marcus-brew-ashmond-183711367
+- GitHub: https://github.com/marcusashmond
 
 ## 🙏 Acknowledgments
 
