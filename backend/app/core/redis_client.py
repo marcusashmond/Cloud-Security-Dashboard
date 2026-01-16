@@ -10,14 +10,24 @@ class RedisClient:
     def __init__(self):
         redis_url = os.getenv("REDIS_URL", "redis://localhost:6379/0")
         # Using decode_responses=True to avoid manual decoding everywhere
-        self.client = redis.from_url(
-            redis_url,
-            decode_responses=True,
-            socket_connect_timeout=5  # Fail fast if Redis is down
-        )
+        try:
+            self.client = redis.from_url(
+                redis_url,
+                decode_responses=True,
+                socket_connect_timeout=5  # Fail fast if Redis is down
+            )
+            # Test connection
+            self.client.ping()
+            self.enabled = True
+        except Exception as e:
+            print(f"Redis connection failed: {e}. Running without cache.")
+            self.client = None
+            self.enabled = False
     
     def get(self, key: str) -> Optional[str]:
         """Get a value from Redis."""
+        if not self.enabled or not self.client:
+            return None
         try:
             return self.client.get(key)
         except Exception as e:
@@ -27,6 +37,8 @@ class RedisClient:
     
     def set(self, key: str, value: str, expire: int = 300):
         """Set a value in Redis with expiration (default 5 minutes)."""
+        if not self.enabled or not self.client:
+            return False
         try:
             self.client.setex(key, expire, value)
             return True

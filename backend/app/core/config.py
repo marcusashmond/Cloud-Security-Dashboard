@@ -15,7 +15,14 @@ class Settings(BaseSettings):
     DEBUG: bool = True
     
     # Database
-    DATABASE_URL: str = "postgresql://user:password@localhost:5432/security_dashboard"
+    # Use SQLite for local development (no Docker needed)
+    # Switch to PostgreSQL for production
+    USE_SQLITE: bool = os.getenv("USE_SQLITE", "true").lower() == "true"
+    DATABASE_URL: str = os.getenv(
+        "DATABASE_URL",
+        "sqlite:///./security_dashboard.db" if os.getenv("USE_SQLITE", "true").lower() == "true" 
+        else "postgresql://user:password@localhost:5432/security_dashboard"
+    )
     
     # Security
     SECRET_KEY: str = "your-secret-key-change-in-production"

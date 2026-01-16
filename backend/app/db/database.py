@@ -9,8 +9,12 @@ from typing import Generator
 from app.core.config import settings
 
 # Create database engine
+# SQLite needs special connect_args
+connect_args = {"check_same_thread": False} if "sqlite" in settings.DATABASE_URL else {}
+
 engine = create_engine(
     settings.DATABASE_URL,
+    connect_args=connect_args,
     pool_pre_ping=True,
     echo=settings.DEBUG
 )
