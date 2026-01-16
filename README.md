@@ -9,7 +9,25 @@ A full-stack, enterprise-grade security monitoring dashboard with **ML threat de
 ![Tests](https://img.shields.io/badge/tests-passing-brightgreen.svg)
 ![Coverage](https://img.shields.io/badge/coverage-85%25-green.svg)
 
-## 📋 Overview
+## � Screenshots
+
+### Dashboard Overview
+![Dashboard](screenshots/dashboard.png)
+*Real-time security monitoring with threat statistics and recent activity*
+
+### Security Logs
+![Logs Table](screenshots/logs.png)
+*Advanced filtering and search with threat detection indicators*
+
+### Analytics & Insights
+![Analytics](screenshots/analytics.png)
+*Interactive charts showing threat trends and severity distribution*
+
+### Alert Management
+![Alerts](screenshots/alerts.png)
+*Automated threat alerts with priority classification*
+
+## �📋 Overview
 
 This Cloud Security Dashboard is a **production-ready** security information and event management (SIEM) system that provides:
 
