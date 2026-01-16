@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     # API Configuration
     API_HOST: str = "0.0.0.0"
     API_PORT: int = 8000
-    DEBUG: bool = True
+    DEBUG: bool = True  # !!! CHANGE TO FALSE IN PRODUCTION !!!
     
     # Database
     # Use SQLite for local development (no Docker needed)

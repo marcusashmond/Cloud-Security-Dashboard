@@ -13,6 +13,7 @@ export default function DashboardPage() {
   const { isAuthenticated, isLoading } = useAuth()
   const router = useRouter()
   const [activeTab, setActiveTab] = useState('overview')
+  // const [autoRefresh, setAutoRefresh] = useState(false)  // was experimenting with this
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {

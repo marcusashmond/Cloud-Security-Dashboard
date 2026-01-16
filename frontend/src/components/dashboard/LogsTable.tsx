@@ -13,6 +13,7 @@ export default function LogsTable() {
     is_threat: '',
   })
   const [temp, setTemp] = useState(null)
+  // const [debugMode, setDebugMode] = useState(false)  // might need later
 
   useEffect(() => {
     fetchLogs()
@@ -21,6 +22,7 @@ export default function LogsTable() {
 
   const fetchLogs = async () => {
     try {
+      // console.log('[DEBUG] Fetching logs with filters:', filters)  // useful for debugging
       const params = new URLSearchParams()
       if (filters.severity) params.append('severity', filters.severity)
       if (filters.is_threat) params.append('is_threat', filters.is_threat)

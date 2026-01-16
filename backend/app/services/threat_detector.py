@@ -64,8 +64,10 @@ class ThreatDetector:
                 threat_score = prediction[1]  # Probability of being a threat
                 is_threat = threat_score > 0.6
                 confidence = max(prediction)
+                # print(f"[ML] Threat detected: {is_threat}, score: {threat_score}")  # debug
                 return is_threat, round(confidence, 3), round(threat_score, 3)
             except Exception as e:
+                # TODO: actually log this somewhere instead of just printing
                 print(f"ML prediction error: {e}, falling back to heuristics")
         
         # Old approach - simple threshold-based detection
@@ -74,7 +76,7 @@ class ThreatDetector:
         #     return True, 0.8, 0.85
         # return False, 0.7, 0.2
         
-        # Fallback to heuristic-based detection
+        # Fallback to heuristic-based detection (kind of basic but works)
         base_score = self.threat_rules.get(log.event_type, 0.5)
         severity_weight = self.severity_weights.get(log.severity, 0.5)
         

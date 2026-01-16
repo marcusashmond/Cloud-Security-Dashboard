@@ -31,9 +31,10 @@ async def get_logs(
     current_user: User = Depends(get_current_user)
 ):
     """Get security logs with filtering"""
+    # if DEBUG_MODE: print(f"Fetching logs: skip={skip}, limit={limit}")  # debug line
     query = db.query(SecurityLog)
     
-    # Apply filters
+    # Apply filters - should probably refactor this into a service class
     if severity:
         query = query.filter(SecurityLog.severity == severity)
     if event_type:

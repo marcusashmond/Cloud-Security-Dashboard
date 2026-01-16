@@ -1,16 +1,14 @@
-"""
-Alerts API Endpoints
-"""
+"""Alerts API Endpoints"""
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import desc
 from typing import List
+from datetime import datetime
 
 from app.db.database import get_db
 from app.db.models import Alert, User, SecurityLog
 from app.schemas.schemas import Alert as AlertSchema, AlertCreate, AlertUpdate
 from app.api.auth import get_current_user
-from datetime import datetime
 
 router = APIRouter()
 
@@ -24,11 +22,14 @@ async def get_alerts(
     current_user: User = Depends(get_current_user)
 ):
     """Get all alerts"""
+    # Build query
     query = db.query(Alert)
     
+    # Filter by status if provided
     if status:
         query = query.filter(Alert.status == status)
     
+    # Get results - probably could optimize this query later
     alerts = query.order_by(desc(Alert.created_at)).offset(skip).limit(limit).all()
     return alerts
 
